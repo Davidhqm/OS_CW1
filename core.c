@@ -4573,6 +4573,14 @@ int sched_fork(unsigned long clone_flags, struct task_struct *p)
 	 * Make sure we do not leak PI boosting priority to the child.
 	 */
 	p->prio = current->normal_prio;
+	
+	int current_nice;
+	current_nice = task_nice(current);
+	if (current_nice < MAX_NICE){
+		current_nice++; 
+		current->normal_prio = NICE_TO_PRIO(current_nice);
+	}
+	
 
 	uclamp_fork(p);
 
