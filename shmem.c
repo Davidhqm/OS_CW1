@@ -11,11 +11,6 @@ static struct class *shmem_class = NULL;
 static struct cdev shmem_cdev;
 static struct page *shared_page = NULL;
 
-static const struct file_operations shmem_fops = {
-    .owner = THIS_MODULE,
-    .mmap = mmap,
-};
-
 static int __init shmem_init(void) {
     dev_t dev_id;
     alloc_chrdev_region(&dev_id, 0, 1, "shmem");
@@ -43,13 +38,13 @@ static int __init shmem_init(void) {
 }
 
 static int mmap(struct file *filp, struct vm_area_struct *vma) {
+    unsigned long pfn;
     // Ensure the memory area is of the expected size (e.g., PAGE_SIZE)
     if ((vma->vm_end - vma->vm_start) != PAGE_SIZE) {
         return -EINVAL; // Incorrect size
     }
 
     // Convert the shared page's address to a physical address, then to PFN
-    unsigned long pfn;
     pfn = page_to_pfn(shared_page);
 
     // Set up page protection for the mapping
@@ -61,6 +56,11 @@ static int mmap(struct file *filp, struct vm_area_struct *vma) {
 
     return 0;
 }
+
+static const struct file_operations shmem_fops = {
+    .owner = THIS_MODULE,
+    .mmap = mmap,
+};
 
 static void __exit shmem_exit(void) {
     device_destroy(shmem_class, MKDEV(dev_major, 0));
