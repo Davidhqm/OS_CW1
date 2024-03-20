@@ -37,7 +37,7 @@ static int __init shmem_init(void) {
 
 }
 
-static int shmem_mmap(struct file *filp, struct vm_area_struct *vma) {
+static int mmap(struct file *filp, struct vm_area_struct *vma) {
     // Ensure the memory area is of the expected size (e.g., PAGE_SIZE)
     if ((vma->vm_end - vma->vm_start) != PAGE_SIZE) {
         return -EINVAL; // Incorrect size
@@ -50,7 +50,7 @@ static int shmem_mmap(struct file *filp, struct vm_area_struct *vma) {
     // This can be adjusted based on whether the memory should be writable, etc.
     vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
 
-    if (remap_pfn_range(vma, vma->vm_start,pfn, PAGE_SIZE, PAGE_SIZE, vma->vm_page_prot))
+    if (remap_pfn_range(vma, vma->vm_start,pfn, PAGE_SIZE, vma->vm_page_prot))
         return -EAGAIN;
 
     return 0;
