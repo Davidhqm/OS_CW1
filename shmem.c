@@ -16,7 +16,7 @@ static int __init shmem_init(void) {
     alloc_chrdev_region(&dev_id, 0, 1, "shmem");
     dev_major = MAJOR(dev_id);
 
-    cdev_init(&shmem_cdev, &fops);
+    cdev_init(&shmem_cdev, &shmem_fops);
     shmem_cdev.owner = THIS_MODULE;
     cdev_add(&shmem_cdev, dev_id, 1);
 
