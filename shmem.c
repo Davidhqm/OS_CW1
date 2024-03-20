@@ -9,7 +9,12 @@
 static int dev_major = 0; // 0 for dynamic allocation
 static struct class *shmem_class = NULL;
 static struct cdev shmem_cdev;
+static struct page *shared_page = NULL;
 
+static const struct file_operations shmem_fops = {
+    .owner = THIS_MODULE,
+    .mmap = mmap,
+};
 
 static int __init shmem_init(void) {
     dev_t dev_id;
@@ -24,7 +29,6 @@ static int __init shmem_init(void) {
     device_create(shmem_class, NULL, dev_id, NULL, "shmem");
 
     // Allocate the shared page here
-    struct page *shared_page;
     shared_page = alloc_page(GFP_KERNEL);
     if (!shared_page) {
         device_destroy(shmem_class, dev_id);
