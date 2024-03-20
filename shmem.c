@@ -24,6 +24,7 @@ static int __init shmem_init(void) {
     device_create(shmem_class, NULL, dev_id, NULL, "shmem");
 
     // Allocate the shared page here
+    struct page *shared_page;
     shared_page = alloc_page(GFP_KERNEL);
     if (!shared_page) {
         device_destroy(shmem_class, dev_id);
@@ -44,7 +45,8 @@ static int mmap(struct file *filp, struct vm_area_struct *vma) {
     }
 
     // Convert the shared page's address to a physical address, then to PFN
-    unsigned long pfn = page_to_pfn(shared_page);
+    unsigned long pfn;
+    pfn = page_to_pfn(shared_page);
 
     // Set up page protection for the mapping
     // This can be adjusted based on whether the memory should be writable, etc.
